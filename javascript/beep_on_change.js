@@ -1,10 +1,13 @@
-((target, text) => {
+//Options:{
+//  text: "Waiting", The text to watch for change
+//  typeToObserve: "text", "text" or "class" picks whether to watch for text content changes or class changes
+//  watchType: "changeFrom", "changeTo", toggles whether the beep happens when the text changes from or to the specified text
+//}
+//
 
-// Find the element
-//const target = document.getElementById("__bolt-status-3444-desc");
-
-// Function to play a beep
-function beep() {
+((target, options) => {
+  // Function to play a beep
+  function beep() {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     const oscillator = ctx.createOscillator();
     oscillator.type = "sine";
@@ -12,25 +15,62 @@ function beep() {
     oscillator.connect(ctx.destination);
     oscillator.start();
     oscillator.stop(ctx.currentTime + 0.2); // 0.2 seconds
-}
+  }
 
-// Observer to watch for changes
-const observer = new MutationObserver(mutations => {
-    mutations.forEach(mutation => {
+  const observeText = () => {
+    // Observer to watch for changes
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
         if (mutation.type === "characterData" || mutation.type === "childList") {
-            //if (target.textContent.trim() !== "Waiting") {
-            if (!target.textContent.trim().includes(text)) {
-                beep();
-                console.log("Status changed to:", target.textContent.trim());
-                observer.disconnect(); // Stop watching after first change
-            }
+          if (options.watchType === "changeTo" && target.textContent.trim().includes(options.text)) {
+            beep();
+            console.log("Status changed to:", target.textContent.trim());
+            observer.disconnect(); 
+          } else if (options.watchType === "changeFrom" && !target.textContent.trim().includes(options.text)) {
+            beep();
+            console.log("Status changed to:", target.textContent.trim());
+            observer.disconnect();
+          }
         }
+      });
     });
-});
 
-// Start observing the element
-observer.observe(target, { childList: true, characterData: true, subtree: true });
+    // Start observing the element
+    observer.observe(target, { childList: true, characterData: true, subtree: true });
+  }
 
-console.log("Watching for status change...");
+  const observeClass = () => {
+    // Observer to watch for changes
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
+        if (mutation.type === "attributes" && mutation.attributeName === "class") {
+          if (options.watchType === "changeTo" && target.classList.contains(options.text)) {
+            beep();
+            console.log("Class changed to:", target.className);
+            observer.disconnect(); // Stop watching after first change
+          } else if (options.watchType === "changeFrom" && !target.classList.contains(options.text)) {
+            beep();
+            console.log("Class changed to:", target.className);
+            observer.disconnect(); // Stop watching after first change
+          }
+        }
+      });
+    });
 
-})(document.getElementById("__bolt-status-37509-desc"), "Waiting" )
+    // Start observing the element
+    observer.observe(target, { attributes: true });
+  }
+
+  if (options.typeToObserve === "text") {
+    // Start observing the text
+    observeText();
+    console.log("Watching for text change...");
+  } else if (options.typeToObserve === "class") {
+    // Start observing the class
+    observeClass();
+    console.log("Watching for class change...");
+  }
+  else {
+    console.error("Invalid type to observe. Use 'text' or 'class'.");
+  }
+})(document.getElementById("__bolt-status-37509-desc"), { text: "Waiting", typeToObserve: "text", watchType: "changeFrom" });
