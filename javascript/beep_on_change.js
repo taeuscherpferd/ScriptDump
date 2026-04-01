@@ -15,6 +15,8 @@
     oscillator.connect(ctx.destination);
     oscillator.start();
     oscillator.stop(ctx.currentTime + 0.2); // 0.2 seconds
+
+    fetch("10.167.214.4/notify");
   }
 
   const observeText = () => {
@@ -73,4 +75,5 @@
   else {
     console.error("Invalid type to observe. Use 'text' or 'class'.");
   }
-})(document.getElementById("__bolt-status-37509-desc"), { text: "Waiting", typeToObserve: "text", watchType: "changeFrom" });
+})(temp1, { text: "neutral", typeToObserve: "class", watchType: "changeFrom" });
+
