@@ -1,2 +1,1 @@
-# ScriptDump
-I tend to leak code throughout my day. I'm going to try and store most of that here now. Maybe some of it will help others too ;)
+Moved everything to [my-dev-env-restorer](https://github.com/taeuscherpferd/my-dev-env-restorer) under scripts and am deprecating this repo 👍
